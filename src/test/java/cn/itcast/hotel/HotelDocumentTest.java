@@ -10,6 +10,8 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -63,6 +65,22 @@ public class HotelDocumentTest {
         String json = response.getSourceAsString();
         HotelDoc hotelDoc = JSON.parseObject(json, HotelDoc.class);
         System.out.println(hotelDoc);
+    }
+
+    @Test
+    public void testUpdateIndex() throws IOException {
+
+        // 1创建request对象
+        UpdateRequest request = new UpdateRequest("hotel", "45845");
+        // 准备请求参数
+        request.doc(
+                "price", "985",
+                "starName", "五钻"
+        );
+
+        // 2发送请求
+        UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
+        System.out.println(response);
     }
 
     @Test
