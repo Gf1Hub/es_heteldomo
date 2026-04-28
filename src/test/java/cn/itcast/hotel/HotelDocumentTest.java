@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSON;
 import org.apache.http.HttpHost;
 import org.apache.lucene.index.IndexReader;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -25,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.util.List;
 
 import static cn.itcast.hotel.constants.HotelConstants.MAPPING_TEMPLATE;
 
@@ -82,6 +85,33 @@ public class HotelDocumentTest {
         UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
         System.out.println(response);
     }
+
+    @Test
+    public void testDeleteIndex() throws IOException {
+
+        // 1创建request对象
+        DeleteRequest request = new DeleteRequest("hotel", "45845");
+
+        // 2发送请求
+        client.delete(request, RequestOptions.DEFAULT);
+    }
+
+    @Test
+    public void testBulkRequest() throws IOException {
+        // 批量查询酒店数据
+        List<Hotel> hotels = hotelService.list();
+        // 1创建request对象
+        BulkRequest request = new BulkRequest();
+        for (Hotel hotel : hotels) {
+            HotelDoc hotelDoc = new HotelDoc(hotel);
+            request.add(new IndexRequest("hotel")
+                    .id(hotelDoc.getId().toString())
+                    .source(JSON.toJSONString(hotelDoc), XContentType.JSON));
+        }
+        // 2发送请求
+        client.bulk(request, RequestOptions.DEFAULT);
+    }
+
 
     @Test
     public void existsHotelIndex() throws IOException {
