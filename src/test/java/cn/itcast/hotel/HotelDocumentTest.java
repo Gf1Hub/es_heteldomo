@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSON;
 import org.apache.http.HttpHost;
 import org.apache.lucene.index.IndexReader;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
@@ -48,6 +50,19 @@ public class HotelDocumentTest {
         request.source(JSON.toJSONString(hotelDoc), XContentType.JSON);
         // 3发送请求
         client.index(request, RequestOptions.DEFAULT);
+    }
+
+    @Test
+    public void testGetIndex() throws IOException {
+
+        // 1创建request对象
+        GetRequest request = new GetRequest("hotel", "45845");
+        // 2发送请求
+        GetResponse response = client.get(request, RequestOptions.DEFAULT);
+        // 3处理响应
+        String json = response.getSourceAsString();
+        HotelDoc hotelDoc = JSON.parseObject(json, HotelDoc.class);
+        System.out.println(hotelDoc);
     }
 
     @Test
